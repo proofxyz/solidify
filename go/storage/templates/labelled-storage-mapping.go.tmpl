@@ -1,0 +1,41 @@
+// SPDX-License-Identifier: MIT
+// Copyright 2022 PROOF Holdings Inc
+// GENERATED CODE - DO NOT EDIT
+pragma solidity 0.8.16;
+
+import {BucketCoordinates} from "solidify-contracts/BucketStorageLib.sol";
+
+library {{.Name}}StorageMapping {
+    error InvalidLookup();
+
+    function locate(uint256 tokenId)
+        internal
+        pure
+        returns (BucketCoordinates memory)
+    {
+        {{range $i, $store := .Stores}}
+            if (tokenId <= {{ lastTokenLabel . }}) {
+                {{$last := lastTokenLabel .Buckets}}
+                uint{{numBits $last}}[{{len .Buckets}}] memory lastLabelInBucket = [
+                {{$s := printUnlessFirstCall ", "}}
+                {{range .Buckets}}
+                    {{call $s}}{{ lastTokenLabel . }}
+                {{end}}
+                ];
+
+                for(uint i; i < {{len .Buckets}}; ++i) {
+                    if (tokenId <= lastLabelInBucket[i]) {
+                        return BucketCoordinates({
+                            storageId: {{$i}},
+                            bucketId: i
+                        });
+                    }
+                }
+            }
+        {{end}}
+
+        revert InvalidLookup();
+    }
+
+}
+

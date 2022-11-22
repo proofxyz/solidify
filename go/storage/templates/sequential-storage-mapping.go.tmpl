@@ -1,0 +1,128 @@
+// SPDX-License-Identifier: MIT
+// Copyright 2022 PROOF Holdings Inc
+// GENERATED CODE - DO NOT EDIT
+pragma solidity 0.8.16;
+
+import {BucketCoordinates} from "solidify-contracts/BucketStorageLib.sol";
+
+/**
+* @notice Defines the various types of the lookup.
+*/
+enum {{.Name}}Type {
+    {{$s := printUnlessFirstCall ", "}}
+    {{ range .FieldsGroups}}
+        /// @dev Valid range [0, {{numFields .}})
+        {{call $s}} {{.Name}}
+    {{end}}
+}
+
+/**
+* @notice Provides an abstraction layer that allows data to be indexed via
+* (type, index) pairs.
+*/
+library {{.Name}}StorageMapping {
+    error InvalidLookup();
+    error Invalid{{.Name}}Type();
+    error Invalid{{.Name}}Index({{.Name}}Type);
+
+    struct StorageCoordinates {
+        BucketCoordinates bucket;
+        uint256 fieldId;
+    }
+
+    /**
+    * @notice Returns the storage coordinates for the given (type, index) pair.
+    */
+    function locate({{.Name}}Type {{ toLower .Name}}Type, uint256 index)
+        internal
+        pure
+        returns (StorageCoordinates memory)
+    {
+        // See also the definition of `{{.Name}}Type`.
+        uint8[{{len .FieldsGroups}}] memory num{{.Name}}sPer{{.Name}}Type = [
+        {{$s := printUnlessFirstCall ", "}}
+        {{range .FieldsGroups}}
+            {{call $s}}{{ numFields .}}
+        {{end}}
+        ];
+
+        if (index >= num{{.Name}}sPer{{.Name}}Type[uint({{ toLower .Name}}Type)]) {
+            revert Invalid{{.Name}}Index({{ toLower .Name}}Type);
+        }
+
+        // First we need to compute the absolute index of the field that we want 
+        // to retrieve. This is computed by going over the types in the order
+        // that they are defined in `{{.Name}}Type` 
+        uint fieldIdx;
+        
+        for(uint i; i < {{len .FieldsGroups}}; ++i) {
+            if (i >= uint({{ toLower .Name}}Type)) {
+                break;
+            }
+            fieldIdx += num{{.Name}}sPer{{.Name}}Type[i];
+        }
+        fieldIdx += index;
+
+        // Now we need to find the corresponging storage coordinates.
+        // The fields in storage follow the same indexing as above if we start
+        // our count at the first Bucket of the first BucketStorage. The fields
+        // therin will have indices `0.._numFieldsPerBucket(0)[0]`.
+        // Then we continue with the second Bucket in the same Storage, and so
+        // on. Once we have exhausted all the Buckets in the first Storage, we 
+        // move on to the next Storage - again starting at the first Bucket.
+
+        StorageCoordinates memory coordinates;
+
+        // With this, it becomes quite easy to find the right coordinates if
+        // we know how many fields we have in each BucketStorage ... 
+        uint{{ bitsNumFields .Stores }}[{{len .Stores}}] memory numFieldsPerStorage = [
+        {{$s := printUnlessFirstCall ", "}}
+        {{range .Stores}}
+            {{call $s}}{{ numFields .}}
+        {{end}}
+        ];
+
+        for(uint i; i < {{len .Stores}}; ++i) {
+        uint{{ bitsNumFields .Stores }} numFields =  numFieldsPerStorage[i];
+            if (fieldIdx < numFields) {
+                coordinates.bucket.storageId = i;
+                break;
+            }
+            fieldIdx -= numFields;
+        }
+
+
+        // ... and Bucket.
+        bytes memory numFieldsPerBucket = _numFieldsPerBucket(coordinates.bucket.storageId);
+        uint numBuckets = numFieldsPerBucket.length;
+
+        for(uint i; i < numBuckets; ++i) {
+        uint8 numFields =  uint8(numFieldsPerBucket[i]);
+            if (fieldIdx < numFields) {
+                coordinates.bucket.bucketId = i;
+                coordinates.fieldId = fieldIdx;
+                return coordinates;
+            }
+            fieldIdx -= numFields;
+        }
+
+        revert Invalid{{.Name}}Type();
+    }
+
+    /**
+    * @notice Number of fields in each bucket of a given BucketStorage.
+    * @dev This has been encoded as `bytes` instead of `uint8[N]` since we
+    * cannot return the latter though a common interface without manually
+    * converting it to `uint8[]` first.
+    */
+    function _numFieldsPerBucket(uint256 storageId) private pure returns (bytes memory) {
+        {{range $i, $s := .Stores}}
+            if (storageId == {{$i}}) {
+                return {{ numFieldsPerBucketHex .}};
+            }
+        {{end}}
+
+        revert InvalidLookup();
+    } 
+}
+

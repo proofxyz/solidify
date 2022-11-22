@@ -1,0 +1,15 @@
+[submodule "lib/openzeppelin-contracts"]
+	path = lib/openzeppelin-contracts
+	url = https://github.com/OpenZeppelin/openzeppelin-contracts
+[submodule "lib/forge-std"]
+	path = lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
+[submodule "lib/inflate-sol"]
+	path = lib/inflate-sol
+	url = https://github.com/cxkoda/inflate-sol
+[submodule "examples/moonbirds/assets/moonbirds-assets"]
+	path = examples/moonbirds/assets/moonbirds-assets
+	url = https://github.com/proofxyz/moonbirds-assets.git
+[submodule "lib/ethier"]
+	path = lib/ethier
+	url = https://github.com/divergencetech/ethier

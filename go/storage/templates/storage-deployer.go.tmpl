@@ -1,0 +1,31 @@
+// SPDX-License-Identifier: MIT
+// Copyright 2022 PROOF Holdings Inc
+// GENERATED CODE - DO NOT EDIT
+pragma solidity 0.8.16;
+
+{{$d := .StoragePath}}
+{{range .Stores}}
+import "{{$d}}/{{.Name}}.sol";
+{{- end}}
+
+library {{.Name}}StorageDeployer {
+    struct Bundle {
+        IBucketStorage[{{len .Stores}}] storages;
+    }
+
+    function deployAsStatic() internal returns (Bundle memory) {
+        return Bundle({storages: [
+            {{$s := printUnlessFirstCall ", "}}
+            {{range .Stores}}
+            {{call $s}}IBucketStorage(new {{.Name}}())
+            {{end}}
+        ]});
+    }
+
+    function deployAsDynamic() internal returns (IBucketStorage[] memory bundle) {
+        bundle = new IBucketStorage[]({{len .Stores}});
+        {{range $i, $s := .Stores}}
+        bundle[{{$i}}] = IBucketStorage(new {{$s.Name}}());
+        {{end}}
+    }
+}

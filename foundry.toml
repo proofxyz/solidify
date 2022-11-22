@@ -1,0 +1,18 @@
+[profile.default]
+src = 'contracts'
+out = 'out'
+libs = ['lib']
+solc_version = "0.8.16"
+ffi=true
+
+fs_permissions = [
+    { access = "read", path = "./test"}
+]
+
+[profile.default.fmt]
+line_length=80
+single_line_statement_blocks = "multi"
+number_underscore="thousands"
+wrap_comments=true
+
+# See more config options https://github.com/foundry-rs/foundry/tree/master/config

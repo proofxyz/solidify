@@ -1,0 +1,21 @@
+{
+  "name": "@proofxyz/solidify",
+  "version": "0.1.0",
+  "description": "",
+  "main": "\"\"",
+  "scripts": {
+    "lint:go": "golint ./... 2>&1 | tee /dev/stderr | xargs -0 test -z",
+    "lint:sol": "solhint -w 0 '**/*.sol'",
+    "lint": "npm run lint:sol && npm run lint:go",
+    "fmt:go": "gofmt -e -d . 2>&1  | tee /dev/stderr | xargs -0 test -z",
+    "fmt:sol": "npx prettier '**/*.sol' --check",
+    "fmt": "npm run fmt:sol && npm run fmt:go"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github.com/proofxyz/solidify"
+  },
+  "devDependencies": {
+    "solhint": "^3.3.7"
+  }
+}

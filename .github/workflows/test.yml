@@ -1,0 +1,81 @@
+name: test
+
+on: [push, workflow_dispatch]
+
+env:
+  FOUNDRY_PROFILE: ci
+
+jobs:
+  test_solidify:
+    name: Test solidify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: "1.18.0"
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Go Generate tests
+        run: |
+          go version
+          go generate ./...
+
+      - name: Run Go tests
+        run: |
+          go version
+          go test ./...
+        id: test_go
+
+      - name: Run Forge tests
+        run: |
+          forge test -vvv
+        id: test_sol
+
+  test_moonbirds:
+    name: Test moonbirds
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: examples/moonbirds
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: "1.18.0"
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Go Generate tests
+        run: |
+          go version
+          go generate ./...
+
+      - name: Run Go tests
+        run: |
+          go version
+          go test ./...
+
+      - name: Build forge test helpers
+        run: |
+          mkdir bin
+          go build -o ./bin ./...
+
+      - name: Run Forge tests
+        run: |
+          forge test -vvv
