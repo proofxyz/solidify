@@ -1,0 +1,57 @@
+name: Lint
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  lint_go:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: "1.18.0"
+
+      - name: Check Go code formatting
+        run: yarn fmt:go
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          # Optional: version of golangci-lint to use in form of v1.2 or v1.2.3 or `latest` to use the latest version
+          version: v1.50.0
+
+  lint_sol:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup NodeJs
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: ./node_modules
+          key: modules-${{ hashFiles('yarn.lock') }}
+
+      - name: Install yarn dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: rm -rf node_modules && yarn install --frozen-lockfile
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Check Solidity code formatting
+        run: forge fmt --check .
+
+      - name: Run solhint
+        run: yarn lint:sol

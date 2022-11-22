@@ -1,0 +1,22 @@
+[profile.default]
+src = 'src'
+out = 'out'
+libs = ['lib', '../../lib']
+solc_version = "0.8.16"
+gas_reports = ["*"]
+optimizer = true
+optimizer_runs = 9999
+ffi=true
+no_match_test = "testAllBirbs"
+
+fs_permissions = [
+    { access = "read", path = "./assets"},
+    { access = "read", path = "./src/gen"},
+    { access = "write", path = "/tmp"},
+]
+
+[profile.full]
+no_match_test = "_" # Phony to disable the test disable pattern above
+
+
+# See more config options https://github.com/foundry-rs/foundry/tree/master/config

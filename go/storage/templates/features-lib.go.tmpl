@@ -1,0 +1,137 @@
+// SPDX-License-Identifier: MIT
+// Copyright 2022 PROOF Holdings Inc
+// GENERATED CODE - DO NOT EDIT
+pragma solidity 0.8.16;
+
+
+/**
+* @notice Struct that unambiguously defines the artwork and attributes of a
+* token.
+*/
+struct Features {
+{{range $f := sorted .FeatureGroups}}
+ /// @dev Valid range [0, {{$f.NumValues}})
+uint8 {{toLower $f.Name}};
+{{end}}
+}
+
+/**
+* @notice Enumeration of the fields in the `Features` struct.
+*/
+enum FeatureType {
+{{ $s := printUnlessFirstCall ","}}
+{{range $f := .FeatureGroups}}
+{{ call $s }}
+{{$f.Name}}
+{{end}}
+}
+
+/**
+* @notice Utility library to work with `Features`
+* @dev This library assumes that `Features` contain <=256 bit of information
+* for efficiency.
+*/
+library FeaturesLib {
+    /**
+    * @notice Thrown if the feature validation fails.
+    */
+    error InvalidFeatures(FeatureType, uint);
+
+    /**
+    * @notice Thrown if a deserialisation from bytes with invalid lenght is 
+    * attempted.
+    */
+    error InvalidLength();
+
+    /**
+    * @notice The Merkle root of all features
+    */
+    bytes32 public constant FEATURES_ROOT = {{ hex .MerkleRoot }};
+
+    /**
+    * @notice Total number of tokens
+    */
+    uint{{numBits .NumTokens}} public constant NUM_TOKENS = {{.NumTokens}};
+
+
+    /**
+    * @notice Number of bytes in the features struct.
+    */
+    uint8 public constant FEATURES_LENGTH = {{len .FeatureGroups}};
+
+    /**
+    *  @notice Reverts if the given features are invalid.
+    */
+    function validate(Features memory features) internal pure {
+        {{range $f := .FeatureGroups}}
+        if (
+         features.{{toLower $f.Name}} >= {{$f.NumValues}}
+        ) {
+            revert InvalidFeatures(FeatureType.{{$f.Name}}, features.{{toLower $f.Name}});
+        }
+        {{- end}}
+    }
+
+
+    /**
+    * @notice Serialises given features.
+    */
+    function serialise(Features memory features) internal pure returns (uint256) {
+        uint256 ret;
+        {{ $s := printUnlessFirstCall "ret <<= 8;"}}
+        {{range $f := .FeatureGroups}}
+        {{ call $s }}
+        ret |= uint256(features.{{toLower $f.Name}});
+        {{- end}}
+        return ret;
+    }
+
+    /**
+     * @notice Computes the hash of given a feature set together with its 
+     * tokenId.
+     * @dev Used for merkle proofs.
+     */
+    function hash(Features memory features, uint256 tokenId)
+        internal
+        pure
+        returns (bytes32)
+    {
+        return keccak256(abi.encodePacked(tokenId, serialise(features)));
+    }
+
+    /**
+    * @notice Deserialise features from an unit256.
+    */
+    function deserialise(uint256 data)
+        internal
+        pure
+        returns (Features memory features)
+    {
+        {{ $s := printUnlessFirstCall "data >>= 8;"}}
+        {{range $f := reversed .FeatureGroups}}
+        {{ call $s }}
+        features.{{toLower $f.Name}} = uint8(data);
+        {{- end}}
+    }
+
+    /**
+    * @notice Deserialise features from a bytes array.
+    * @dev Used to deserialise bucket data.
+    */
+    function deserialise(bytes memory data)
+        internal
+        pure
+        returns (Features memory)
+    {
+        if (data.length != {{len .FeatureGroups}}) {
+            revert InvalidLength();
+        }
+
+        uint256 data_;
+        assembly {
+            data_ := shr({{unusedBits .FeatureGroups}}, mload(add(data, 0x20)))
+        }
+
+        return deserialise(data_);
+    }
+}

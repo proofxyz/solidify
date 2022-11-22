@@ -1,0 +1,9 @@
+ds-test/=../../lib/forge-std/lib/ds-test/src/
+forge-std/=../../lib/forge-std/src/
+inflate-sol/=../../lib/inflate-sol/contracts/
+openzeppelin-contracts/=../../lib/openzeppelin-contracts/contracts
+@openzeppelin/contracts/=../../lib/openzeppelin-contracts/contracts
+ethier/=../../lib/ethier/contracts
+solidify-contracts/=../../contracts
+
+moonbirds-inchain/=src/

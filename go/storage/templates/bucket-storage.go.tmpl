@@ -1,0 +1,59 @@
+// SPDX-License-Identifier: MIT
+// Copyright 2022 PROOF Holdings Inc
+// GENERATED CODE - DO NOT EDIT
+pragma solidity 0.8.16;
+
+import {IBucketStorage, Compressed} from "solidify-contracts/IBucketStorage.sol";
+
+
+/**
+* @notice Stores a list of compressed buckets in contract code. 
+*/
+contract {{.Store.Name}} is IBucketStorage {
+
+    /**
+    * @notice Returns number of buckets stored in this contract.
+    */
+    function numBuckets() external pure returns (uint256) {
+        return {{len .Store.Buckets}};
+    }
+
+    /**
+    * @notice Returns the number of fields stored in this contract.
+    */
+    function numFields() external pure returns (uint256) {
+        return {{.Store.NumFields}};
+    }
+
+    /**
+    * @notice Returns number of fields in each bucket in this storge.
+    */
+    function numFieldsPerBucket() external pure returns (uint256[] memory) {
+        bytes memory num_ = {{numFieldsPerBucketHex .Store}};
+
+        uint[] memory num = new uint[]({{len .Store.Buckets}});
+        for (uint i; i < {{len .Store.Buckets}}; ) {
+            num[i] = uint8(num_[i]);
+            unchecked {
+                ++i;
+            }
+        }
+        return num;
+    }
+
+    /**
+    * @notice Returns the bucket with a given index.
+    * @dev Reverts if the index is out-of-bounds.
+    */
+    function getBucket(uint256 idx) external pure returns (Compressed memory) {
+        {{ range $i, $b := .Store.Buckets}}
+        if (idx == {{$i}}) {
+            return Compressed({
+                uncompressedSize: {{ $b.UncompressedSize }},
+                data: {{ hex $b.Data }}
+            });
+        }
+        {{end}}
+        revert InvalidBucketIndex();
+    }
+}
