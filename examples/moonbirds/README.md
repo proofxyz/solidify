@@ -77,36 +77,6 @@ Layers --> Artwork
 For data management, we first devise two intermediate representations that are closely related to the image and attribute data in its raw form: Layers and Traits (see also the following sections for more details).
 Both contain a descriptor (type + index pair) that uniquely identifies a blob of data, that is an image or string stored as a `Field` in a `Bucket`.
 
-```mermaid
-flowchart LR
-Features --> LayerTranslator --> Layers
-subgraph Layers
-  LayerDescriptor1
-  LayerDescriptor2
-end
-
-
-Features --> TraitTranslator --> Traits
-subgraph Traits
-  TraitDescriptor1
-  TraitDescriptor2
-end
-
-
-LayerDescriptor1 --> StorageMapping
-TraitDescriptor1 --> StorageMapping
-
-StorageMapping --> Storage
-Storage --> Assembler
-
-Assembler --> Artwork
-Assembler --> Attributes
-```
-
-The assembly of the final Moonbird happens in multiple steps:
-- First a given set of features is translated into a set of Layers and Traits. This step is straightforward for Moonbirds was therefore implemented manually (see also [Assembler.sol](./src/Assembler.sol)).
-- Next the 
-
 ### Layers
 
 Layers correspond to the physical files that need to be stored/loaded to create the artwork.
@@ -223,7 +193,37 @@ Trait "1" <-- "1..*" Attribute
 Name <-- Attribute
 ```
 
+## Artwork / attribute assemlby
+
+```mermaid
+flowchart LR
+Features --> LayerTranslator --> Layers
+subgraph Layers
+  LayerDescriptor1
+  LayerDescriptor2
+end
 
 
+Features --> TraitTranslator --> Traits
+subgraph Traits
+  TraitDescriptor1
+  TraitDescriptor2
+end
 
 
+LayerDescriptor1 --> StorageMapping
+TraitDescriptor1 --> StorageMapping
+
+StorageMapping --> Storage
+Storage --> Assembler
+
+Assembler --> Artwork
+Assembler --> Attributes
+```
+
+The assembly of the final Moonbird happens in multiple steps:
+- First a given set of features is translated into a set of Layers and Traits. This step is straightforward for Moonbirds and was therefore implemented manually (see also [Assembler.sol](./src/Assembler.sol)).
+- Next the required Layers and Traits are retrieved sequentially from storage using the generated storage maps for field groups (e.g. see `src/gen/LayerStorageMapping.sol` after code generation).
+- Each retrieved layer or trait is added to the canvas or attributes buffer, respectively.
+  - Each trait except the body is added directly to a list of attributes. For the body trait (e.g. "Emperor - Pink") we need to split the value into separate body and feather attributes first to add them to the buffer.
+  - Layer composition is a little bit more difficult because each layer needs to be blended onto a canvas. The necessary routines can be found in [ethier](https://github.com/divergencetech/ethier/blob/main/contracts/utils/Image.sol).
