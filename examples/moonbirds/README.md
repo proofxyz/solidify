@@ -3,7 +3,19 @@
 Here we showcases `solidify` by applying it to the assets of Moonbirds, generating the storage and utility contracts we used for our in-chain renderer.
 
 This repo only contains the code that is most relevant for the on-chain data consumption.
-To see all contracts we refer the reader to 
+To see all contracts including the on-chain image scale-up we refer the interested reader to the Etherscan.
+
+| Contract                 | Address                                                                                                               |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| LayerBucketStorage0      | [0x39376eb7EA01398E8109fC0f7e8B48C888F2c435](https://etherscan.io/address/0x39376eb7EA01398E8109fC0f7e8B48C888F2c435) |
+| LayerBucketStorage1      | [0x92b25103Cb72777453DA669F5c18C0B984ecE509](https://etherscan.io/address/0x92b25103Cb72777453DA669F5c18C0B984ecE509) |
+| LayerBucketStorage2      | [0xcC77E1776A151E23c7A129FDC77FE4367928a178](https://etherscan.io/address/0xcC77E1776A151E23c7A129FDC77FE4367928a178) |
+| TraitBucketStorage0      | [0xe64bE8D4D986Ab3393b8546a858F011BB12D87F7](https://etherscan.io/address/0xe64bE8D4D986Ab3393b8546a858F011BB12D87F7) |
+| AssetStorageManager      | [0xEDe24B4988cb64cC07fB72fF8AE71Bd8bB031b70](https://etherscan.io/address/0xEDe24B4988cb64cC07fB72fF8AE71Bd8bB031b70) |
+| Assembler                | [0xA40ba836A32CB0e81a760D170BE5e29533f76e6f](https://etherscan.io/address/0xA40ba836A32CB0e81a760D170BE5e29533f76e6f) |
+| MoonbirdFeaturesRegistry | [0xF8D83845DEb59EE43CF012e57731209A472baF8c](https://etherscan.io/address/0xF8D83845DEb59EE43CF012e57731209A472baF8c) |
+| ProofBackgroundRegistry  | [0xB1499A80024Ff0c3AF27D0af125b0F838153D96c](https://etherscan.io/address/0xB1499A80024Ff0c3AF27D0af125b0F838153D96c) |
+| MoonbirdsInchainRenderer | [0x85701AD420553315028a49A16f078D5FF62F4762](https://etherscan.io/address/0x85701AD420553315028a49A16f078D5FF62F4762) |
 
 
 ## Quick start
