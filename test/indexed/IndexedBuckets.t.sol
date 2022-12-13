@@ -15,7 +15,8 @@ import {
 import {IBucketStorage} from "solidify-contracts/IBucketStorage.sol";
 import {
     BucketStorageLib,
-    BucketCoordinates
+    BucketCoordinates,
+    FieldCoordinates
 } from "solidify-contracts/BucketStorageLib.sol";
 import {IndexedBucketLib} from "solidify-contracts/IndexedBucketLib.sol";
 
