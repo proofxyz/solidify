@@ -90,7 +90,7 @@ contract BucketStorageLibTest is Test {
         uint256 wantStorageId,
         uint256 wantBucketId,
         uint256 wantFieldId
-    ) public {
+    ) internal {
         FieldCoordinates memory coords =
             bundle.locateByAbsoluteFieldId(absoluteFieldIdx);
 
@@ -122,7 +122,7 @@ contract BucketStorageLibTest is Test {
         uint256 wantStorageId,
         uint256 wantBucketId,
         uint256 wantFieldId
-    ) public {
+    ) internal {
         uint256[] memory fieldGroupSizes = new uint256[](4);
         fieldGroupSizes[0] = 3;
         fieldGroupSizes[1] = 5;
