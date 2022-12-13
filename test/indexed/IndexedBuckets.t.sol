@@ -15,7 +15,8 @@ import {
 import {IBucketStorage} from "solidify-contracts/IBucketStorage.sol";
 import {
     BucketStorageLib,
-    BucketCoordinates
+    BucketCoordinates,
+    FieldCoordinates
 } from "solidify-contracts/BucketStorageLib.sol";
 import {IndexedBucketLib} from "solidify-contracts/IndexedBucketLib.sol";
 
@@ -81,5 +82,35 @@ contract IndexedBucketsTest is Test {
         assertEq(_loadMapped(GroupStorageType.BAR, 1), "bar1");
         assertEq(_loadMapped(GroupStorageType.BAR, 2), "bar2");
         assertEq(_loadMapped(GroupStorageType.QUX, 0), "qux0");
+    }
+
+    function testLocateByFieldGroups() public {
+        assertLocation(0, 0, 0, 0, 0);
+        assertLocation(0, 1, 0, 0, 1);
+        assertLocation(1, 0, 0, 1, 0);
+        assertLocation(1, 1, 0, 1, 1);
+        assertLocation(1, 2, 0, 1, 2);
+        assertLocation(2, 0, 1, 0, 0);
+    }
+
+    function assertLocation(
+        uint256 fieldGroupId,
+        uint256 fieldIdx,
+        uint256 wantStorageId,
+        uint256 wantBucketId,
+        uint256 wantFieldId
+    ) public {
+        uint256[] memory fieldGroupSizes = new uint256[](3);
+        fieldGroupSizes[0] = 2;
+        fieldGroupSizes[1] = 3;
+        fieldGroupSizes[2] = 1;
+
+        FieldCoordinates memory coords = bundle.locateByFieldGroupAndIndex(
+            fieldGroupSizes, fieldGroupId, fieldIdx
+        );
+
+        assertEq(coords.bucket.storageId, wantStorageId);
+        assertEq(coords.bucket.bucketId, wantBucketId);
+        assertEq(coords.fieldId, wantFieldId);
     }
 }
