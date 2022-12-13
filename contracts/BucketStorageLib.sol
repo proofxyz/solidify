@@ -112,31 +112,30 @@ library BucketStorageLib {
     ) internal view returns (FieldCoordinates memory) {
         uint256 storageId;
         uint256 len = bundle.length;
-        uint256 fieldId;
+        uint256 localFieldId = absoluteFieldId;
 
         for (; storageId < len; ++storageId) {
             uint256 numFields_ = bundle[storageId].numFields();
 
-            if (fieldId + numFields_ > absoluteFieldId) {
+            if (localFieldId < numFields_) {
                 break;
             }
-            fieldId += numFields_;
+            localFieldId -= numFields_;
         }
 
         uint256[] memory numFieldsPerBucket =
             bundle[storageId].numFieldsPerBucket();
-
         uint256 bucketId;
         for (; bucketId < numFieldsPerBucket.length; ++bucketId) {
-            if (fieldId + numFieldsPerBucket[bucketId] > absoluteFieldId) {
+            if (localFieldId < numFieldsPerBucket[bucketId]) {
                 break;
             }
-            fieldId += numFieldsPerBucket[bucketId];
+            localFieldId -= numFieldsPerBucket[bucketId];
         }
 
         return FieldCoordinates({
             bucket: BucketCoordinates({storageId: storageId, bucketId: bucketId}),
-            fieldId: absoluteFieldId - fieldId
+            fieldId: localFieldId
         });
     }
 
