@@ -85,15 +85,15 @@ contract IndexedBucketsTest is Test {
     }
 
     function testLocateByFieldGroups() public {
-        assertLocation(0, 0, 0, 0, 0);
-        assertLocation(0, 1, 0, 0, 1);
-        assertLocation(1, 0, 0, 1, 0);
-        assertLocation(1, 1, 0, 1, 1);
-        assertLocation(1, 2, 0, 1, 2);
-        assertLocation(2, 0, 1, 0, 0);
+        _testLocateByFieldGroupAndIndex(0, 0, 0, 0, 0);
+        _testLocateByFieldGroupAndIndex(0, 1, 0, 0, 1);
+        _testLocateByFieldGroupAndIndex(1, 0, 0, 1, 0);
+        _testLocateByFieldGroupAndIndex(1, 1, 0, 1, 1);
+        _testLocateByFieldGroupAndIndex(1, 2, 0, 1, 2);
+        _testLocateByFieldGroupAndIndex(2, 0, 1, 0, 0);
     }
 
-    function assertLocation(
+    function _testLocateByFieldGroupAndIndex(
         uint256 fieldGroupId,
         uint256 fieldIdx,
         uint256 wantStorageId,

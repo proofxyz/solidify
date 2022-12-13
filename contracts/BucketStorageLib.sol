@@ -108,32 +108,35 @@ library BucketStorageLib {
      */
     function locateByAbsoluteFieldId(
         IBucketStorage[] storage bundle,
-        uint256 fieldId
+        uint256 absoluteFieldId
     ) internal view returns (FieldCoordinates memory) {
         uint256 storageId;
         uint256 len = bundle.length;
+        uint256 fieldId;
+
         for (; storageId < len; ++storageId) {
             uint256 numFields_ = bundle[storageId].numFields();
 
-            if (fieldId < numFields_) {
+            if (fieldId + numFields_ > absoluteFieldId) {
                 break;
             }
-            fieldId -= numFields_;
+            fieldId += numFields_;
         }
 
         uint256[] memory numFieldsPerBucket =
             bundle[storageId].numFieldsPerBucket();
+
         uint256 bucketId;
         for (; bucketId < numFieldsPerBucket.length; ++bucketId) {
-            if (fieldId < numFieldsPerBucket[bucketId]) {
+            if (fieldId + numFieldsPerBucket[bucketId] > absoluteFieldId) {
                 break;
             }
-            fieldId -= numFieldsPerBucket[bucketId];
+            fieldId += numFieldsPerBucket[bucketId];
         }
 
         return FieldCoordinates({
             bucket: BucketCoordinates({storageId: storageId, bucketId: bucketId}),
-            fieldId: fieldId
+            fieldId: absoluteFieldId - fieldId
         });
     }
 
