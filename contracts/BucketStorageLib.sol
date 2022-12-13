@@ -101,7 +101,7 @@ library BucketStorageLib {
      * @dev The association between global fieldId and stored field is
      * established by hierarchically iterating through each structure.
      * We start our count at the first Bucket of the first BucketStorage. The
-     * fields therin will have indices `0..bundle[0].numFieldsPerBucket()[0]`.
+     * fields therin will have indices `[0,bundle[0].numFieldsPerBucket()[0])`.
      * Then we continue with the second Bucket in the same Storage, and so
      * on. Once we have exhausted all the Buckets in the first Storage, we
      * move on to the next Storage - again starting at the first Bucket.
