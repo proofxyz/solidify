@@ -99,23 +99,6 @@ contract BucketStorageLibTest is Test {
         assertEq(coords.fieldId, wantFieldId, "wrong field id");
     }
 
-    function testLocateByFieldGroups() public {
-        // See also _testLocateByFieldGroupAndIndex. For this test we are using
-        // 4 field groups with 3,5,2,1 fields, respectively, and test them
-        // in the same order as in `testLocateByAbsoluteFieldId`.
-        _testLocateByFieldGroupAndIndex(0, 0, 0, 0, 0);
-        _testLocateByFieldGroupAndIndex(0, 1, 0, 0, 1);
-        _testLocateByFieldGroupAndIndex(0, 2, 0, 1, 0);
-        _testLocateByFieldGroupAndIndex(1, 0, 0, 1, 1);
-        _testLocateByFieldGroupAndIndex(1, 1, 0, 1, 2);
-        _testLocateByFieldGroupAndIndex(1, 2, 1, 0, 0);
-        _testLocateByFieldGroupAndIndex(1, 3, 1, 1, 0);
-        _testLocateByFieldGroupAndIndex(1, 4, 1, 1, 1);
-        _testLocateByFieldGroupAndIndex(2, 0, 1, 1, 2);
-        _testLocateByFieldGroupAndIndex(2, 1, 1, 1, 3);
-        _testLocateByFieldGroupAndIndex(3, 0, 1, 1, 4);
-    }
-
     function _testLocateByFieldGroupAndIndex(
         uint256 fieldGroupId,
         uint256 fieldIdx,
@@ -136,5 +119,19 @@ contract BucketStorageLibTest is Test {
         assertEq(coords.bucket.storageId, wantStorageId, "wrong storage id");
         assertEq(coords.bucket.bucketId, wantBucketId, "wrong bucket id");
         assertEq(coords.fieldId, wantFieldId, "wrong field id");
+    }
+
+    function testLocateByFieldGroups() public {
+        _testLocateByFieldGroupAndIndex(0, 0, 0, 0, 0);
+        _testLocateByFieldGroupAndIndex(0, 1, 0, 0, 1);
+        _testLocateByFieldGroupAndIndex(0, 2, 0, 1, 0);
+        _testLocateByFieldGroupAndIndex(1, 0, 0, 1, 1);
+        _testLocateByFieldGroupAndIndex(1, 1, 0, 1, 2);
+        _testLocateByFieldGroupAndIndex(1, 2, 1, 0, 0);
+        _testLocateByFieldGroupAndIndex(1, 3, 1, 1, 0);
+        _testLocateByFieldGroupAndIndex(1, 4, 1, 1, 1);
+        _testLocateByFieldGroupAndIndex(2, 0, 1, 1, 2);
+        _testLocateByFieldGroupAndIndex(2, 1, 1, 1, 3);
+        _testLocateByFieldGroupAndIndex(3, 0, 1, 1, 4);
     }
 }
