@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 // Copyright 2022 PROOF Holdings Inc
-pragma solidity 0.8.16;
+pragma solidity >=0.8.16 <0.9.0;
 
 import {Compressed} from "solidify-contracts/Compressed.sol";
 
