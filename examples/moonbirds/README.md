@@ -3,7 +3,19 @@
 Here we showcases `solidify` by applying it to the assets of Moonbirds, generating the storage and utility contracts we used for our in-chain renderer.
 
 This repo only contains the code that is most relevant for the on-chain data consumption.
-To see all contracts we refer the reader to 
+To see all contracts including the on-chain image scale-up we refer the interested reader to the Etherscan.
+
+| Contract                 | Address                                                                                                               |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| LayerBucketStorage0      | [0x39376eb7EA01398E8109fC0f7e8B48C888F2c435](https://etherscan.io/address/0x39376eb7EA01398E8109fC0f7e8B48C888F2c435) |
+| LayerBucketStorage1      | [0x92b25103Cb72777453DA669F5c18C0B984ecE509](https://etherscan.io/address/0x92b25103Cb72777453DA669F5c18C0B984ecE509) |
+| LayerBucketStorage2      | [0xcC77E1776A151E23c7A129FDC77FE4367928a178](https://etherscan.io/address/0xcC77E1776A151E23c7A129FDC77FE4367928a178) |
+| TraitBucketStorage0      | [0xe64bE8D4D986Ab3393b8546a858F011BB12D87F7](https://etherscan.io/address/0xe64bE8D4D986Ab3393b8546a858F011BB12D87F7) |
+| AssetStorageManager      | [0xEDe24B4988cb64cC07fB72fF8AE71Bd8bB031b70](https://etherscan.io/address/0xEDe24B4988cb64cC07fB72fF8AE71Bd8bB031b70) |
+| Assembler                | [0xA40ba836A32CB0e81a760D170BE5e29533f76e6f](https://etherscan.io/address/0xA40ba836A32CB0e81a760D170BE5e29533f76e6f) |
+| MoonbirdFeaturesRegistry | [0xF8D83845DEb59EE43CF012e57731209A472baF8c](https://etherscan.io/address/0xF8D83845DEb59EE43CF012e57731209A472baF8c) |
+| ProofBackgroundRegistry  | [0xB1499A80024Ff0c3AF27D0af125b0F838153D96c](https://etherscan.io/address/0xB1499A80024Ff0c3AF27D0af125b0F838153D96c) |
+| MoonbirdsInchainRenderer | [0x85701AD420553315028a49A16f078D5FF62F4762](https://etherscan.io/address/0x85701AD420553315028a49A16f078D5FF62F4762) |
 
 
 ## Quick start
@@ -64,36 +76,6 @@ Layers --> Artwork
 
 For data management, we first devise two intermediate representations that are closely related to the image and attribute data in its raw form: Layers and Traits (see also the following sections for more details).
 Both contain a descriptor (type + index pair) that uniquely identifies a blob of data, that is an image or string stored as a `Field` in a `Bucket`.
-
-```mermaid
-flowchart LR
-Features --> LayerTranslator --> Layers
-subgraph Layers
-  LayerDescriptor1
-  LayerDescriptor2
-end
-
-
-Features --> TraitTranslator --> Traits
-subgraph Traits
-  TraitDescriptor1
-  TraitDescriptor2
-end
-
-
-LayerDescriptor1 --> StorageMapping
-TraitDescriptor1 --> StorageMapping
-
-StorageMapping --> Storage
-Storage --> Assembler
-
-Assembler --> Artwork
-Assembler --> Attributes
-```
-
-The assembly of the final Moonbird happens in multiple steps:
-- First a given set of features is translated into a set of Layers and Traits. This step is straightforward for Moonbirds was therefore implemented manually (see also [Assembler.sol](./src/Assembler.sol)).
-- Next the 
 
 ### Layers
 
@@ -211,7 +193,37 @@ Trait "1" <-- "1..*" Attribute
 Name <-- Attribute
 ```
 
+## Artwork / attribute assemlby
+
+```mermaid
+flowchart LR
+Features --> LayerTranslator --> Layers
+subgraph Layers
+  LayerDescriptor1
+  LayerDescriptor2
+end
 
 
+Features --> TraitTranslator --> Traits
+subgraph Traits
+  TraitDescriptor1
+  TraitDescriptor2
+end
 
 
+LayerDescriptor1 --> StorageMapping
+TraitDescriptor1 --> StorageMapping
+
+StorageMapping --> Storage
+Storage --> Assembler
+
+Assembler --> Artwork
+Assembler --> Attributes
+```
+
+The assembly of the final Moonbird happens in multiple steps:
+- First a given set of features is translated into a set of Layers and Traits. This step is straightforward for Moonbirds and was therefore implemented manually (see also [Assembler.sol](./src/Assembler.sol)).
+- Next the required Layers and Traits are retrieved sequentially from storage using the generated storage maps for field groups (e.g. see `src/gen/LayerStorageMapping.sol` after code generation).
+- Each retrieved layer or trait is added to the canvas or attributes buffer, respectively.
+  - Each trait except the body is added directly to a list of attributes. For the body trait (e.g. "Emperor - Pink") we need to split the value into separate body and feather attributes first to add them to the buffer.
+  - Layer composition is a little bit more difficult because each layer needs to be blended onto a canvas. The necessary routines can be found in [ethier](https://github.com/divergencetech/ethier/blob/main/contracts/utils/Image.sol).
